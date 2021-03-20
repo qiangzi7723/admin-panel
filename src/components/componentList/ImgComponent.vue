@@ -8,7 +8,7 @@
 			<div class='e-content'>
 				<div class='e-line'>
 					<p>标题</p>
-					<el-input placeholder="请输入内容" size="mini" v-model="content.title">
+					<el-input placeholder="请输入内容" size="mini" v-model="content.title" @change='change'>
 					</el-input>
 				</div>
 			</div>
@@ -33,6 +33,7 @@
 		Vue
 	} from 'vue-property-decorator';
 	import upload from '@/axios/api/upload'
+	import state from '@/state/index'
 
 	@Component
 	export default class ImgComponnet extends Vue {
@@ -40,14 +41,17 @@
 
 		private content = {
 			show: false,
-			title: '',
-			url: ''
+			title: state.imgComponent.title
 		}
 
 		private async uploadFile(e: any) {
 			const data = await upload.upload("2302", e.file);
 			console.log(data);
-			this.content.url = data.data.url;
+		}
+
+		private change(e: any){
+			state.imgComponent.title = e;
+			console.log(e);
 		}
 	}
 </script>

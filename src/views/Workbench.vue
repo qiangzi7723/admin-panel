@@ -36,37 +36,7 @@
                 <iframe src="http://192.168.31.186:8081/home?activityId=2302" frameborder="0" id='iframe'
                     ref='rFrame'></iframe>
             </section>
-            <section class='rt' :style="{width: editerWidth + 'px'}">
-                <span>这是编辑器</span>
-                <div class='rt-border' @mousedown='mouseDown'></div>
-                <section class='editor'>
-                    <div class='e-tab'>
-                        <p>页面配置</p>
-                        <div class='e-content'>
-                            <div class='e-line'>
-                                <p>标题</p>
-                                <el-input placeholder="请输入内容" size="mini" v-model="title">
-                                </el-input>
-                            </div>
-                        </div>
-                        <div class='e-content'>
-                            <div class='e-line'>
-                                <p>头图</p>
-                                <el-upload class="el-uploader" action="" :http-request="uploadFile">
-                                    <img v-if="imgUpload.src" :src="imgUpload.src" class="avatar">
-                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                </el-upload>
-                            </div>
-                        </div>
-                    </div>
-                    <div class='e-tab'>
-                        <p>组件配置</p>
-                        <div class='component-edit' v-for='item of aside.componentList' :key='item.ckey'>
-                            <ImgComponnet v-if='item.ckey == "img"' :item=item></ImgComponnet>
-                        </div>
-                    </div>
-                </section>
-            </section>
+            <Editor></Editor>
         </main>
     </div>
 </template>
@@ -80,27 +50,20 @@
     import upload from '@/axios/api/upload';
     import workbenchAPI from '@/axios/api/workbenchAPI';
     import ImgComponnet from '@/components/componentList/ImgComponent.vue';
+    import state from '@/state/index';
+    import Editor from '@/components/render/Editor.vue';
 
     @Component({
         components:{
-            ImgComponnet
+            ImgComponnet,
+            Editor
         }
     })
 
     export default class Workbench extends Vue {
-        private mouseTrack = {
-            cx: 0,
-            cy: 0,
-            mx: 0,
-            my: 0
-        }
 
-        private editerWidth = 400;
-        private imgUpload = {
-            src: ''
-        }
-        private title = ''
         private iFrame: any = null
+        private state = state;
 
         private aside = {
             componentAdd: {
@@ -113,53 +76,37 @@
             this.$router.push('/');
         }
 
-        private mouseDown(e: MouseEvent) {
-            this.mouseTrack.cx = e.clientX;
-            document.addEventListener('mousemove', this.mouseMove);
-            document.addEventListener('mouseup', this.mouseUp);
-        }
-
-        private mouseMove(e: MouseEvent) {
-            // 加一个节流
-            this.editerWidth -= e.movementX;
-        }
-
-        private mouseUp(e: MouseEvent) {
-            document.removeEventListener('mousemove', this.mouseMove);
-            document.removeEventListener('mouseup', this.mouseUp);
-        }
-
-        private async uploadFile(e: any) {
-            const data = await upload.upload("2302", e.file);
-            console.log(data);
-            this.imgUpload.src = data.data.url;
-        }
+        
 
         private async created() {
             const data = await workbenchAPI.boot();
             console.log(data.data);
             const pageConfig = JSON.parse(data.data.pageConfig);
-            this.imgUpload.src = pageConfig.url;
-            this.title = pageConfig.title;
-
+            // this.imgUpload.src = pageConfig.url;
+            // this.title = pageConfig.title;
+            // state.imgComponent = pageConfig.state.imgComponent;
             this.iFrame = document.getElementById('iframe');
             this.iFrame.onload = () => {
                 // 这里有时候会无法执行
 
             }
-
         }
 
         private async publish() {
             const config = {
-                url: this.imgUpload.src,
-                title: this.title
+                // url: this.imgUpload.src,
+                // title: this.title,
+                state
             }
+
             await workbenchAPI.change("2302", config);
             this.iFrame.contentWindow.postMessage({
                 data: config,
                 from: 'workbench'
             }, 'http://192.168.31.186:8081');
+
+
+            console.log(state);
         }
 
         private componentDefine = {
