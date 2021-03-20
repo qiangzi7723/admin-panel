@@ -48,7 +48,6 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 	if(to.name != 'Login'){
 		const jwt = ls.get('jwt');
-		console.log(to, jwt);
 		if(jwt == null){
 			// 说明未登录
 			next({name: 'Login'});

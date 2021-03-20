@@ -14,7 +14,6 @@ const ls = {
     get(key: string): any{
         const newKey = commonPrefix(key);
         let source: any = window.localStorage.getItem(newKey);
-        console.log(source)
         try{
             source = JSON.parse(source);
         }catch(e){

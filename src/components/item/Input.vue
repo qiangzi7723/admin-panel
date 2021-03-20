@@ -10,7 +10,8 @@
     import {
         Component,
         Prop,
-        Vue
+        Vue,
+        Watch
     } from 'vue-property-decorator';
 
     @Component
@@ -32,6 +33,11 @@
             this.innerValue = value
             this.$emit('input', value);
         }
+
+        @Watch('value')
+        public watchValue(){
+            this.innerValue = this.value;
+        }
     }
 </script>
 
@@ -46,7 +52,7 @@
             flex: 1;
             margin: 0;
             text-align: start;
-            padding-left: 10px;
+            padding-left: 20px;
         }
 
         .el-input {

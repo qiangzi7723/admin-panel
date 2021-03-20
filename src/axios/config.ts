@@ -3,6 +3,7 @@ import axios, {
 } from 'axios';
 import Vue from 'vue'
 import ls from '@/adapter/ls'
+import router from '../router'
 
 axios.defaults.baseURL = 'http://activity.via.cool:3014';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -36,6 +37,10 @@ type responseWrap = {
 const requestCb = (response: responseWrap): responseEntity => {
     if (response.data.code != "0") {
         Vue.prototype.$message(response.data.msg);
+    }
+    if(response.data.code == '503'){
+        // 未登录，自动回去重新登录
+        router.push('/login')
     }
     return response.data;
 }
